@@ -25,7 +25,6 @@ const assignmentSchema = new Schema<IAssignment>(
       type: Schema.Types.ObjectId,
       ref: "Course",
       required: true,
-      index: true,
     },
     title: {
       type: String,

@@ -60,7 +60,6 @@ const quizSchema = new Schema<IQuiz>(
       type: Schema.Types.ObjectId,
       ref: "Course",
       required: true,
-      index: true,
     },
     title: {
       type: String,

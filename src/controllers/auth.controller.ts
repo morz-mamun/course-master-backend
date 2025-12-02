@@ -4,6 +4,7 @@ import { authService } from "../services/auth.service";
 import { generateToken } from "../config/jwt";
 import { loginSchema, registerSchema } from "../utils/validation";
 import { AppError } from "../middleware/error-handler";
+import config from "../config";
 
 export const register = async (req: AuthRequest, res: Response) => {
   try {
@@ -24,9 +25,9 @@ export const register = async (req: AuthRequest, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.node_env === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 1 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({

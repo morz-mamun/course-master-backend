@@ -11,6 +11,7 @@ import { AppError } from "../middleware/error-handler";
 import Assignment from "../models/Assignment";
 import Quiz from "../models/Quiz";
 import { calculateQuizScore } from "../utils/helpers";
+import { Types } from "mongoose";
 
 export const enrollCourse = async (req: AuthRequest, res: Response) => {
   try {
@@ -88,14 +89,14 @@ export const submitAssignment = async (req: AuthRequest, res: Response) => {
     if (!assignment) {
       throw new AppError("Assignment not found", 404);
     }
-
     const submission = {
-      studentId: req.user.userId,
+      studentId: new Types.ObjectId(req.user.userId),
       submissionText: validated.submissionText,
       submissionLink: validated.submissionLink,
       submittedAt: new Date(),
     };
 
+    assignment.submissions.push(submission);
     assignment.submissions.push(submission);
     await assignment.save();
 
@@ -130,15 +131,15 @@ export const submitQuiz = async (req: AuthRequest, res: Response) => {
 
     const score = calculateQuizScore(validated.answers, quiz.questions);
     const passed = score >= quiz.passingScore;
-
     const attempt = {
-      studentId: req.user.userId,
+      studentId: new Types.ObjectId(req.user.userId),
       answers: validated.answers,
       score,
       attemptedAt: new Date(),
       timeTaken: validated.timeTaken,
     };
 
+    quiz.attempts.push(attempt);
     quiz.attempts.push(attempt);
     await quiz.save();
 

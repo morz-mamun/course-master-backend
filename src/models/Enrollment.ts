@@ -15,13 +15,11 @@ const enrollmentSchema = new Schema<IEnrollment>(
       type: Schema.Types.ObjectId,
       ref: "Course",
       required: true,
-      index: true,
     },
     studentId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     batchId: {
       type: String,

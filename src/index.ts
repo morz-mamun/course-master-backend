@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import express, { type Express, type Request, type Response } from "express";
+import express, { Application, type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectDB } from "./config/database";
 import config from "./config";
-// import authRoutes from "./routes/authRoutes"
-// import courseRoutes from "./routes/courseRoutes"
-// import studentRoutes from "./routes/studentRoutes"
-// import adminRoutes from "./routes/adminRoutes"
-// import { errorHandler } from "./middleware/errorHandler"
+import { errorHandler } from "./middleware/error-handler";
+import authRoutes from "./routes/auth.routes";
+import coursesRoutes from "./routes/courses.routes";
+import studentRoutes from "./routes/student.routes";
 
-const app: Express = express();
+const app: Application = express();
 const PORT = config?.port || 5000;
 
 // Middleware
@@ -26,18 +25,22 @@ app.use(
 );
 
 // Routes
-// app.use("/api/auth", authRoutes)
-// app.use("/api/courses", courseRoutes)
-// app.use("/api/student", studentRoutes)
-// app.use("/api/admin", adminRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/courses", coursesRoutes);
+app.use("/api", studentRoutes);
 
 // Health check
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.json({ status: "OK", message: "Server is running" });
 });
 
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
 // Global error handler
-// app.use(errorHandler)
+app.use(errorHandler);
 
 // Start server
 connectDB()

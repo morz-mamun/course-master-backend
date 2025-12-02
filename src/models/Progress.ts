@@ -18,13 +18,11 @@ const progressSchema = new Schema<IProgress>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     courseId: {
       type: Schema.Types.ObjectId,
       ref: "Course",
       required: true,
-      index: true,
     },
     lessonsCompleted: {
       type: Number,
