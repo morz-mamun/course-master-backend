@@ -4,34 +4,46 @@ import { ZodError } from "zod";
 export class AppError extends Error {
   constructor(
     public message: string,
-    public statusCode: number,
+    public statusCode: number = 500,
   ) {
     super(message);
     this.name = "AppError";
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 
 export const errorHandler = (
-  error: Error | ZodError | AppError,
+  error: unknown,
   req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ) => {
+  console.error(error);
+
+  // Zod validation error
   if (error instanceof ZodError) {
-    const formattedErrors = error.issues.map((err) => ({
-      path: err.path.join("."),
-      message: err.message,
-    }));
     return res.status(400).json({
-      error: "Validation error",
-      details: formattedErrors,
+      success: false,
+      message: "Validation error",
+      errors: error.issues.map((err) => ({
+        path: err.path.join("."),
+        message: err.message,
+      })),
     });
   }
 
+  // Known AppError
   if (error instanceof AppError) {
-    return res.status(error.statusCode).json({ error: error.message });
+    return res.status(error.statusCode).json({
+      success: false,
+      message: error.message,
+    });
   }
 
-  console.error("Unhandled error:", error);
-  res.status(500).json({ error: "Internal server error" });
+  // Unknown error (fallback)
+  return res.status(500).json({
+    success: false,
+    message: "Internal server error",
+    ...(process.env.NODE_ENV === "development" && { error }),
+  });
 };
