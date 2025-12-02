@@ -1,4 +1,5 @@
 import express from "express";
+import { authMiddleware, adminMiddleware } from "../middleware/auth.middleware";
 import {
   createCourse,
   getCourses,
@@ -6,7 +7,6 @@ import {
   updateCourse,
   deleteCourse,
 } from "../controllers/course.controller";
-import { authMiddleware, adminMiddleware } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
