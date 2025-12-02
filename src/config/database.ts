@@ -3,7 +3,7 @@ import config from ".";
 
 export const connectDB = async (): Promise<void> => {
   try {
-    const mongoUri = config.database_url;
+    const mongoUri = config?.database_url;
     if (!mongoUri) {
       throw new Error("DATABASE_URL is not defined in environment variables");
     }
