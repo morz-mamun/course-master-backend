@@ -1,15 +1,27 @@
-import config from "."
+import jwt from "jsonwebtoken";
 
-export const JWT_SECRET = config.jwt_secret || "secret-key-change-in-production"
-export const JWT_EXPIRE = config.jwt_expire || "1d"
-
-export const jwtConfig = {
-  secret: JWT_SECRET,
-  expiresIn: JWT_EXPIRE,
-  cookieOptions: {
-    httpOnly: true,
-    secure: config.node_env === "production",
-    sameSite: "strict" as const,
-    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
-  },
+export interface JWTPayload {
+  userId: string;
+  email: string;
+  role: "student" | "admin";
 }
+
+export const generateToken = (payload: JWTPayload): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  return jwt.sign(payload, secret, {
+    expiresIn: process.env.JWT_EXPIRE || "7d",
+  });
+};
+
+export const verifyToken = (token: string): JWTPayload => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  return jwt.verify(token, secret) as JWTPayload;
+};
