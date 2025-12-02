@@ -10,18 +10,8 @@ export default defineConfig([
     extends: ['js/recommended', ...tseslint.configs.recommended],
     languageOptions: { globals: globals.browser },
     rules: {
-      // 'no-unused-vars': [
-      //   'warn',
-      //   { argsIgnorePattern: '^_' },  // Allow unused parameters starting with _
-      // ],
-      // '@typescript-eslint/no-unused-vars': [
-      //   'warn',
-      //   { argsIgnorePattern: '^_' },  // Same rule for TypeScript
-      // ],
-
       'no-unused-vars': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-
       'no-undef': 'warn',
       'prefer-const': 'error',
       'no-console': 'warn',

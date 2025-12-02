@@ -1,4 +1,5 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
+import config from ".";
 
 export interface JWTPayload {
   userId: string;
@@ -7,21 +8,23 @@ export interface JWTPayload {
 }
 
 export const generateToken = (payload: JWTPayload): string => {
-  const secret = process.env.JWT_SECRET;
+  const secret = config.jwt_secret;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  return jwt.sign(payload, secret, {
-    expiresIn: process.env.JWT_EXPIRE || "7d",
-  });
+  const options: SignOptions = {
+    expiresIn: config.jwt_expire,
+  };
+
+  return jwt.sign(payload, secret as jwt.Secret, options);
 };
 
 export const verifyToken = (token: string): JWTPayload => {
-  const secret = process.env.JWT_SECRET;
+  const secret = config.jwt_secret;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  return jwt.verify(token, secret) as JWTPayload;
+  return jwt.verify(token, secret as jwt.Secret) as JWTPayload;
 };
