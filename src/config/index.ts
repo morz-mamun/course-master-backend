@@ -6,6 +6,9 @@ export default {
   // Database
   database_url: process.env.DATABASE_URL as string,
 
+  // Frontend
+  frontend_url: process.env.FRONTEND_URL as string,
+
   // JWT
   jwt_secret: process.env.JWT_SECRET as string,
   jwt_expire: (process.env.JWT_EXPIRES_IN ??
