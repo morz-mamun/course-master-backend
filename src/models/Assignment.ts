@@ -1,5 +1,8 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
+/**
+ * Assignment document interface
+ */
 export interface IAssignment extends Document {
   courseId: mongoose.Types.ObjectId;
   title: string;

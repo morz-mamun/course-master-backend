@@ -3,6 +3,9 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
+/**
+ * Application configuration object
+ */
 export default {
   // Server
   node_env: process.env.NODE_ENV ?? "development",

@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 
+/**
+ * Custom application error class with status code
+ */
 export class AppError extends Error {
   constructor(
     public message: string,
@@ -12,6 +15,13 @@ export class AppError extends Error {
   }
 }
 
+/**
+ * Global error handling middleware
+ * @param error - Error object
+ * @param req - Express request
+ * @param res - Express response
+ * @param next - Express next function
+ */
 export const errorHandler = (
   error: unknown,
   req: Request,

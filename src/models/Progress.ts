@@ -1,5 +1,8 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
+/**
+ * Progress tracking document interface
+ */
 export interface IProgress extends Document {
   studentId: mongoose.Types.ObjectId;
   courseId: mongoose.Types.ObjectId;

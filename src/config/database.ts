@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import config from ".";
 
+/**
+ * Establishes connection to MongoDB database
+ * @returns Promise that resolves when connection is established
+ */
 export const connectDB = async (): Promise<void> => {
   try {
     const mongoUri = config?.database_url;

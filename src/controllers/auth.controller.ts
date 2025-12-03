@@ -6,6 +6,11 @@ import { loginSchema, registerSchema } from "../utils/validation";
 import { AppError } from "../middleware/error-handler";
 import config from "../config";
 
+/**
+ * Registers a new user account
+ * @param req - Express request with registration data
+ * @param res - Express response
+ */
 export const register = async (req: AuthRequest, res: Response) => {
   try {
     const validated = registerSchema.parse(req.body);
@@ -46,6 +51,11 @@ export const register = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Authenticates a user and creates a session
+ * @param req - Express request with login credentials
+ * @param res - Express response
+ */
 export const login = async (req: AuthRequest, res: Response) => {
   try {
     const validated = loginSchema.parse(req.body);
@@ -81,11 +91,21 @@ export const login = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Logs out the current user by clearing the authentication cookie
+ * @param req - Express request
+ * @param res - Express response
+ */
 export const logout = (req: AuthRequest, res: Response) => {
   res.clearCookie("token");
   res.json({ message: "Logged out successfully" });
 };
 
+/**
+ * Retrieves the currently authenticated user's information
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const getCurrentUser = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {

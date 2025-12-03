@@ -1,5 +1,8 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
+/**
+ * Enrollment document interface
+ */
 export interface IEnrollment extends Document {
   courseId: mongoose.Types.ObjectId;
   studentId: mongoose.Types.ObjectId;

@@ -5,7 +5,17 @@ import Course from "../models/Course";
 import { AppError } from "../middleware/error-handler";
 import { calculateProgressPercentage } from "../utils/helpers";
 
+/**
+ * Service class for handling student-related operations
+ */
 export class StudentService {
+  /**
+   * Enrolls a student in a course
+   * @param studentId - Student's unique identifier
+   * @param courseId - Course unique identifier
+   * @param batchId - Batch identifier for the enrollment
+   * @returns Promise resolving to the enrollment record
+   */
   async enrollCourse(
     studentId: string,
     courseId: string,
@@ -52,6 +62,11 @@ export class StudentService {
     return enrollment.save();
   }
 
+  /**
+   * Retrieves all courses a student is enrolled in with progress data
+   * @param studentId - Student's unique identifier
+   * @returns Promise resolving to list of enrolled courses with progress
+   */
   async getStudentCourses(studentId: string) {
     const enrollments = await Enrollment.find({ studentId })
       .populate({
@@ -76,6 +91,13 @@ export class StudentService {
     return coursesWithProgress;
   }
 
+  /**
+   * Updates a student's progress for a specific lesson
+   * @param studentId - Student's unique identifier
+   * @param courseId - Course unique identifier
+   * @param lessonId - Lesson identifier to mark as completed
+   * @returns Promise resolving to updated progress record
+   */
   async updateProgress(
     studentId: string,
     courseId: string,

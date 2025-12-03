@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/**
+ * Validation schema for user registration
+ */
 export const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -7,11 +10,17 @@ export const registerSchema = z.object({
   role: z.enum(["student", "admin"]).optional().default("student"),
 });
 
+/**
+ * Validation schema for user login
+ */
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
+/**
+ * Validation schema for course creation and updates
+ */
 export const courseSchema = z.object({
   title: z.string().min(3, "Course title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -41,16 +50,25 @@ export const courseSchema = z.object({
     .optional(),
 });
 
+/**
+ * Validation schema for course enrollment
+ */
 export const enrollmentSchema = z.object({
   courseId: z.string(),
   batchId: z.string(),
 });
 
+/**
+ * Validation schema for progress updates
+ */
 export const progressSchema = z.object({
   courseId: z.string(),
   lessonId: z.string(),
 });
 
+/**
+ * Validation schema for assignment submissions
+ */
 export const assignmentSubmissionSchema = z
   .object({
     assignmentId: z.string(),
@@ -62,6 +80,9 @@ export const assignmentSubmissionSchema = z
     "Either submission text or link must be provided",
   );
 
+/**
+ * Validation schema for quiz submissions
+ */
 export const quizSubmissionSchema = z.object({
   quizId: z.string(),
   answers: z.array(z.number()),

@@ -7,6 +7,11 @@ export interface JWTPayload {
   role: "student" | "admin";
 }
 
+/**
+ * Generates a JWT token for user authentication
+ * @param payload - Token payload containing user information
+ * @returns Signed JWT token string
+ */
 export const generateToken = (payload: JWTPayload): string => {
   const secret = config.jwt_secret;
   if (!secret) {
@@ -20,6 +25,11 @@ export const generateToken = (payload: JWTPayload): string => {
   return jwt.sign(payload, secret as jwt.Secret, options);
 };
 
+/**
+ * Verifies and decodes a JWT token
+ * @param token - JWT token string to verify
+ * @returns Decoded token payload
+ */
 export const verifyToken = (token: string): JWTPayload => {
   const secret = config.jwt_secret;
   if (!secret) {

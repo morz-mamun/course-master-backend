@@ -1,6 +1,9 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
 // Lesson interface
+/**
+ * Lesson interface for course syllabus
+ */
 export interface ILesson {
   lessonId: string;
   title: string;
@@ -10,6 +13,9 @@ export interface ILesson {
 }
 
 // Batch interface
+/**
+ * Batch interface for course enrollment periods
+ */
 export interface IBatch {
   batchId: string;
   startDate: Date;
@@ -19,6 +25,9 @@ export interface IBatch {
 }
 
 // Course interface
+/**
+ * Course document interface
+ */
 export interface ICourse extends Document {
   title: string;
   description: string;

@@ -6,6 +6,12 @@ export interface AuthRequest extends Request {
   user?: JWTPayload;
 }
 
+/**
+ * Middleware to verify JWT token and authenticate requests
+ * @param req - Express request with cookies
+ * @param res - Express response
+ * @param next - Express next function
+ */
 export const authMiddleware = (
   req: AuthRequest,
   res: Response,
@@ -30,6 +36,12 @@ export const authMiddleware = (
   }
 };
 
+/**
+ * Middleware to verify user has admin role
+ * @param req - Express request with authenticated user
+ * @param res - Express response
+ * @param next - Express next function
+ */
 export const adminMiddleware = (
   req: AuthRequest,
   res: Response,

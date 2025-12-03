@@ -13,6 +13,11 @@ import Quiz from "../models/Quiz";
 import { calculateQuizScore } from "../utils/helpers";
 import { Types } from "mongoose";
 
+/**
+ * Enrolls a student in a course
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const enrollCourse = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -37,6 +42,11 @@ export const enrollCourse = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Retrieves all courses enrolled by the authenticated student
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const getStudentCourses = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -52,6 +62,11 @@ export const getStudentCourses = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Updates student's progress for a specific lesson in a course
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const updateProgress = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -77,6 +92,11 @@ export const updateProgress = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Submits an assignment for a student
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const submitAssignment = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -97,7 +117,6 @@ export const submitAssignment = async (req: AuthRequest, res: Response) => {
     };
 
     assignment.submissions.push(submission);
-    assignment.submissions.push(submission);
     await assignment.save();
 
     res.status(201).json({
@@ -112,6 +131,11 @@ export const submitAssignment = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Submits a quiz attempt for a student
+ * @param req - Express request with user authentication
+ * @param res - Express response
+ */
 export const submitQuiz = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -139,7 +163,6 @@ export const submitQuiz = async (req: AuthRequest, res: Response) => {
       timeTaken: validated.timeTaken,
     };
 
-    quiz.attempts.push(attempt);
     quiz.attempts.push(attempt);
     await quiz.save();
 

@@ -1,16 +1,25 @@
 import mongoose, { Schema, type Document } from "mongoose";
 
+/**
+ * Quiz question option interface
+ */
 export interface IQuestionOption {
   text: string;
   isCorrect: boolean;
 }
 
+/**
+ * Quiz question interface
+ */
 export interface IQuestion {
   questionText: string;
   options: IQuestionOption[];
   explanation: string;
 }
 
+/**
+ * Quiz document interface
+ */
 export interface IQuiz extends Document {
   courseId: mongoose.Types.ObjectId;
   title: string;

@@ -4,6 +4,11 @@ import { courseService } from "../services/course.service";
 import { courseSchema } from "../utils/validation";
 import { AppError } from "../middleware/error-handler";
 
+/**
+ * Creates a new course (Admin only)
+ * @param req - Express request with course data
+ * @param res - Express response
+ */
 export const createCourse = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -24,6 +29,11 @@ export const createCourse = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Retrieves a list of courses with optional filtering and pagination
+ * @param req - Express request with query parameters
+ * @param res - Express response
+ */
 export const getCourses = async (req: AuthRequest, res: Response) => {
   try {
     const { search, category, tags, sort, page, limit } = req.query;
@@ -45,6 +55,11 @@ export const getCourses = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Retrieves a single course by ID
+ * @param req - Express request with course ID parameter
+ * @param res - Express response
+ */
 export const getCourseById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -62,6 +77,11 @@ export const getCourseById = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Updates an existing course (Admin only)
+ * @param req - Express request with course ID and update data
+ * @param res - Express response
+ */
 export const updateCourse = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -83,6 +103,11 @@ export const updateCourse = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * Deletes a course (Admin only)
+ * @param req - Express request with course ID parameter
+ * @param res - Express response
+ */
 export const deleteCourse = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
