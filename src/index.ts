@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/error-handler";
 import authRoutes from "./routes/auth.routes";
 import coursesRoutes from "./routes/courses.routes";
 import studentRoutes from "./routes/student.routes";
+import adminRoutes from "./routes/admin.routes";
 
 const app: Application = express();
 const PORT = config?.port || 5000;
@@ -33,11 +34,13 @@ app.use((req: Request, res: Response, next) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", coursesRoutes);
+app.use("/api/admin", adminRoutes); // Must be before student routes to avoid conflicts
 app.use("/api", studentRoutes);
 
 console.log("📍 Routes mounted:");
 console.log("  - /api/auth");
 console.log("  - /api/courses");
+console.log("  - /api/admin");
 console.log("  - /api (student routes including /materials)");
 
 // Health check

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { Response } from "express";
 import type { AuthRequest } from "../middleware/auth.middleware";
 import { studentService } from "../services/student.service";
@@ -14,7 +12,6 @@ import Assignment from "../models/Assignment";
 import Quiz from "../models/Quiz";
 import { calculateQuizScore } from "../utils/helpers";
 import { Types } from "mongoose";
-import Enrollment from "../models/Enrollment";
 
 /**
  * Enrolls a student in a course
@@ -180,66 +177,6 @@ export const submitQuiz = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     res.status(error instanceof AppError ? error.statusCode : 400).json({
       error: error instanceof Error ? error.message : "Failed to submit quiz",
-    });
-  }
-};
-
-/**
- * Retrieves all enrollments (Admin only)
- * @param req - Express request
- * @param res - Express response
- */
-export const getAllEnrollments = async (req: AuthRequest, res: Response) => {
-  try {
-    const enrollments = await Enrollment.find()
-      .populate("courseId", "title")
-      .populate("studentId", "name email")
-      .sort({ createdAt: -1 });
-
-    res.json({ enrollments });
-  } catch (error) {
-    res.status(500).json({
-      error:
-        error instanceof Error ? error.message : "Failed to fetch enrollments",
-    });
-  }
-};
-
-/**
- * Retrieves all assignment submissions (Admin only)
- * @param req - Express request
- * @param res - Express response
- */
-export const getAllSubmissions = async (req: AuthRequest, res: Response) => {
-  try {
-    // Find all assignments that have submissions
-    const assignments = await Assignment.find({
-      "submissions.0": { $exists: true },
-    })
-      .populate("courseId", "title")
-      .populate("submissions.studentId", "name email");
-
-    // Flatten the structure to return a list of submissions
-    const submissions = assignments.flatMap((assignment) =>
-      assignment.submissions.map((sub) => ({
-        _id: sub._id, // This might be undefined if sub doesn't have _id, but mongoose subdocs usually do
-        assignmentId: assignment._id,
-        assignmentTitle: assignment.title,
-        courseTitle: (assignment.courseId as any).title,
-        studentName: (sub.studentId as any).name,
-        studentEmail: (sub.studentId as any).email,
-        submittedAt: sub.submittedAt,
-        score: sub.score,
-        submissionLink: sub.submissionLink,
-        submissionText: sub.submissionText,
-      })),
-    );
-
-    res.json({ submissions });
-  } catch (error) {
-    res.status(500).json({
-      error:
-        error instanceof Error ? error.message : "Failed to fetch submissions",
     });
   }
 };
