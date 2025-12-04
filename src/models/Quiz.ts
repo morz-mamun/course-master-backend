@@ -22,11 +22,13 @@ export interface IQuestion {
  */
 export interface IQuiz extends Document {
   courseId: mongoose.Types.ObjectId;
+  lessonId: string;
   title: string;
   description: string;
   questions: IQuestion[];
   passingScore: number;
   attempts: {
+    _id: mongoose.Types.ObjectId;
     studentId: mongoose.Types.ObjectId;
     answers: number[]; // index of selected option per question
     score: number;
@@ -70,6 +72,10 @@ const quizSchema = new Schema<IQuiz>(
       ref: "Course",
       required: true,
     },
+    lessonId: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: [true, "Quiz title is required"],
@@ -95,7 +101,6 @@ const quizSchema = new Schema<IQuiz>(
           default: Date.now,
         },
         timeTaken: Number,
-        _id: false,
       },
     ],
   },

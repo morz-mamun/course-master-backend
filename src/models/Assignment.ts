@@ -5,11 +5,13 @@ import mongoose, { Schema, type Document } from "mongoose";
  */
 export interface IAssignment extends Document {
   courseId: mongoose.Types.ObjectId;
+  lessonId: string;
   title: string;
   description: string;
   dueDate: Date;
   maxScore: number;
   submissions: {
+    _id: mongoose.Types.ObjectId;
     studentId: mongoose.Types.ObjectId;
     submissionText?: string;
     submissionLink?: string;
@@ -27,6 +29,10 @@ const assignmentSchema = new Schema<IAssignment>(
     courseId: {
       type: Schema.Types.ObjectId,
       ref: "Course",
+      required: true,
+    },
+    lessonId: {
+      type: String,
       required: true,
     },
     title: {
@@ -62,7 +68,6 @@ const assignmentSchema = new Schema<IAssignment>(
         score: Number,
         feedback: String,
         gradedAt: Date,
-        _id: false,
       },
     ],
   },

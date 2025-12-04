@@ -24,10 +24,21 @@ app.use(
   }),
 );
 
+// Debug: Log all incoming requests
+app.use((req: Request, res: Response, next) => {
+  console.log(`🔍 ${req.method} ${req.path}`);
+  next();
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", coursesRoutes);
 app.use("/api", studentRoutes);
+
+console.log("📍 Routes mounted:");
+console.log("  - /api/auth");
+console.log("  - /api/courses");
+console.log("  - /api (student routes including /materials)");
 
 // Health check
 app.get("/", (req: Request, res: Response) => {
