@@ -7,7 +7,6 @@ import User from "../models/User";
 import Enrollment from "../models/Enrollment";
 import Assignment from "../models/Assignment";
 import Quiz from "../models/Quiz";
-import { Types } from "mongoose";
 
 /**
  * Retrieves dashboard statistics for admin

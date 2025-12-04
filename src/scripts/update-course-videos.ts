@@ -5,8 +5,6 @@ import path from "path";
 
 // Load env vars
 dotenv.config({ path: path.join(process.cwd(), ".env") });
-console.log("Loading .env from:", path.join(process.cwd(), ".env"));
-console.log("DATABASE_URL:", process.env.DATABASE_URL ? "Found" : "Not Found");
 
 const COURSE_ID = "692f5ba4535cff2717e7b54a";
 

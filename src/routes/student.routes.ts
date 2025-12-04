@@ -19,6 +19,4 @@ router.post("/progress", authMiddleware, updateProgress);
 router.post("/assignments", authMiddleware, submitAssignment);
 router.post("/quiz/submit", authMiddleware, submitQuiz);
 
-console.log("✅ Student routes registered, including /materials endpoint");
-
 export default router;

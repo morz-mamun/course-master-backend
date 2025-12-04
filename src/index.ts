@@ -34,27 +34,21 @@ app.use((req: Request, res: Response, next) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", coursesRoutes);
-app.use("/api/admin", adminRoutes); // Must be before student routes to avoid conflicts
-app.use("/api", studentRoutes);
-
-console.log("📍 Routes mounted:");
-console.log("  - /api/auth");
-console.log("  - /api/courses");
-console.log("  - /api/admin");
-console.log("  - /api (student routes including /materials)");
+app.use("/api/admin", adminRoutes);
+app.use("/api/student", studentRoutes);
 
 // Health check
 app.get("/", (req: Request, res: Response) => {
   res.json({ status: "OK", message: "Server is running" });
 });
 
+// Global error handler
+app.use(errorHandler);
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Route not found" });
 });
-
-// Global error handler
-app.use(errorHandler);
 
 // Start server
 connectDB()
