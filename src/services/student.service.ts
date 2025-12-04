@@ -33,6 +33,16 @@ export class StudentService {
       throw new AppError("Course not found", 404);
     }
 
+    // Verify batch exists and has capacity
+    const batch = course.batches.find((b) => b.batchId === batchId);
+    if (!batch) {
+      throw new AppError("Batch not found", 404);
+    }
+
+    if (batch.enrolledCount >= batch.capacity) {
+      throw new AppError("Batch is full", 400);
+    }
+
     // Create enrollment
     const enrollment = new Enrollment({
       courseId,
@@ -58,6 +68,17 @@ export class StudentService {
     });
 
     await progress.save();
+
+    // Update course enrollment count and batch enrolled count
+    await Course.findOneAndUpdate(
+      { _id: courseId, "batches.batchId": batchId },
+      {
+        $inc: {
+          enrollmentCount: 1,
+          "batches.$.enrolledCount": 1,
+        },
+      },
+    );
 
     return enrollment.save();
   }
