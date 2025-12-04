@@ -7,7 +7,7 @@ import {
   submitQuiz,
   getLessonMaterials,
 } from "../controllers/student.controller";
-import { authMiddleware, adminMiddleware } from "../middleware/auth.middleware";
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
