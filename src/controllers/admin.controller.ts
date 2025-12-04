@@ -238,3 +238,179 @@ export const gradeAssignment = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+/**
+ * Create a new assignment for a lesson
+ * @param req - Express request with user authentication and assignment data
+ * @param res - Express response
+ */
+export const createAssignment = async (req: AuthRequest, res: Response) => {
+  try {
+    const { courseId, lessonId, title, description, dueDate, maxScore } =
+      req.body;
+
+    // Validate required fields
+    if (!courseId || !lessonId || !title || !description || !dueDate) {
+      return res.status(400).json({
+        error:
+          "Course ID, Lesson ID, title, description, and due date are required",
+      });
+    }
+
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Create the assignment
+    const assignment = await Assignment.create({
+      courseId,
+      lessonId,
+      title,
+      description,
+      dueDate: new Date(dueDate),
+      maxScore: maxScore || 100,
+      submissions: [],
+    });
+
+    res.status(201).json({
+      message: "Assignment created successfully",
+      assignment,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error:
+        error instanceof Error ? error.message : "Failed to create assignment",
+    });
+  }
+};
+
+/**
+ * Create a new quiz for a lesson
+ * @param req - Express request with user authentication and quiz data
+ * @param res - Express response
+ */
+export const createQuiz = async (req: AuthRequest, res: Response) => {
+  try {
+    const { courseId, lessonId, title, description, questions, passingScore } =
+      req.body;
+
+    // Validate required fields
+    if (
+      !courseId ||
+      !lessonId ||
+      !title ||
+      !questions ||
+      !Array.isArray(questions)
+    ) {
+      return res.status(400).json({
+        error: "Course ID, Lesson ID, title, and questions array are required",
+      });
+    }
+
+    // Validate questions structure
+    for (const question of questions) {
+      if (
+        !question.questionText ||
+        !question.options ||
+        !Array.isArray(question.options)
+      ) {
+        return res.status(400).json({
+          error: "Each question must have questionText and options array",
+        });
+      }
+
+      const hasCorrectAnswer = question.options.some(
+        (opt: any) => opt.isCorrect,
+      );
+      if (!hasCorrectAnswer) {
+        return res.status(400).json({
+          error: "Each question must have at least one correct answer",
+        });
+      }
+    }
+
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Create the quiz
+    const quiz = await Quiz.create({
+      courseId,
+      lessonId,
+      title,
+      description: description || "",
+      questions,
+      passingScore: passingScore || 70,
+      attempts: [],
+    });
+
+    res.status(201).json({
+      message: "Quiz created successfully",
+      quiz,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : "Failed to create quiz",
+    });
+  }
+};
+
+/**
+ * Get all assignments for a specific lesson
+ * @param req - Express request with courseId and lessonId params
+ * @param res - Express response
+ */
+export const getAssignmentsByLesson = async (
+  req: AuthRequest,
+  res: Response,
+) => {
+  try {
+    const { courseId, lessonId } = req.params;
+
+    if (!courseId || !lessonId) {
+      return res.status(400).json({
+        error: "Course ID and Lesson ID are required",
+      });
+    }
+
+    const assignments = await Assignment.find({ courseId, lessonId }).select(
+      "-submissions",
+    );
+
+    res.json({ assignments });
+  } catch (error) {
+    res.status(500).json({
+      error:
+        error instanceof Error ? error.message : "Failed to fetch assignments",
+    });
+  }
+};
+
+/**
+ * Get all quizzes for a specific lesson
+ * @param req - Express request with courseId and lessonId params
+ * @param res - Express response
+ */
+export const getQuizzesByLesson = async (req: AuthRequest, res: Response) => {
+  try {
+    const { courseId, lessonId } = req.params;
+
+    if (!courseId || !lessonId) {
+      return res.status(400).json({
+        error: "Course ID and Lesson ID are required",
+      });
+    }
+
+    const quizzes = await Quiz.find({ courseId, lessonId }).select("-attempts");
+
+    res.json({ quizzes });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : "Failed to fetch quizzes",
+    });
+  }
+};

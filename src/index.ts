@@ -27,7 +27,7 @@ app.use(
 
 // Debug: Log all incoming requests
 app.use((req: Request, res: Response, next) => {
-  console.log(`🔍 ${req.method} ${req.path}`);
+  // console.log(`🔍 ${req.method} ${req.path}`);
   next();
 });
 

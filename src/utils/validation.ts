@@ -86,7 +86,7 @@ export const assignmentSubmissionSchema = z
 export const quizSubmissionSchema = z.object({
   quizId: z.string(),
   answers: z.array(z.number()),
-  timeTaken: z.number().positive(),
+  timeTaken: z.number().min(0, "Time taken must be non-negative"),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

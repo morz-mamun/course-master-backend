@@ -7,6 +7,10 @@ import {
   getAllEnrollments,
   getAllSubmissions,
   getAllQuizAttempts,
+  createAssignment,
+  createQuiz,
+  getAssignmentsByLesson,
+  getQuizzesByLesson,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -57,5 +61,43 @@ router.get(
  * @access  Admin only
  */
 router.post("/grade", authMiddleware, adminMiddleware, gradeAssignment);
+
+/**
+ * @route   POST /api/admin/assignments
+ * @desc    Create a new assignment for a lesson
+ * @access  Admin only
+ */
+router.post("/assignments", authMiddleware, adminMiddleware, createAssignment);
+
+/**
+ * @route   POST /api/admin/quizzes
+ * @desc    Create a new quiz for a lesson
+ * @access  Admin only
+ */
+router.post("/quizzes", authMiddleware, adminMiddleware, createQuiz);
+
+/**
+ * @route   GET /api/admin/assignments/:courseId/:lessonId
+ * @desc    Get all assignments for a specific lesson
+ * @access  Admin only
+ */
+router.get(
+  "/assignments/:courseId/:lessonId",
+  authMiddleware,
+  adminMiddleware,
+  getAssignmentsByLesson,
+);
+
+/**
+ * @route   GET /api/admin/quizzes/:courseId/:lessonId
+ * @desc    Get all quizzes for a specific lesson
+ * @access  Admin only
+ */
+router.get(
+  "/quizzes/:courseId/:lessonId",
+  authMiddleware,
+  adminMiddleware,
+  getQuizzesByLesson,
+);
 
 export default router;

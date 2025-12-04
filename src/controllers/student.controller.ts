@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Response } from "express";
 import type { AuthRequest } from "../middleware/auth.middleware";
 import { studentService } from "../services/student.service";
@@ -194,21 +196,78 @@ export const getLessonMaterials = async (req: AuthRequest, res: Response) => {
       throw new AppError("Course ID and Lesson ID are required", 400);
     }
 
+    // Fetch assignments
     const assignments = await Assignment.find({
       courseId,
       lessonId,
-    }).select("-submissions"); // Don't send submissions to student
+    });
 
+    // Fetch quizzes
     const quizzes = await Quiz.find({
       courseId,
       lessonId,
-    }).select("-attempts"); // Don't send attempts to student
+    });
 
-    // Check for student's submissions/attempts to show status
-    // This is a bit more complex, for now let's just return the materials
-    // The frontend can check status if needed or we can enhance this later
+    // If user is authenticated, include their submission/attempt status
+    const studentId = req.user?.userId;
 
-    res.json({ assignments, quizzes });
+    // Process assignments to include student's submission status
+    const assignmentsWithStatus = assignments.map((assignment) => {
+      const assignmentObj: any = assignment.toObject();
+
+      if (studentId) {
+        // Find student's submission
+        const studentSubmission = assignment.submissions.find(
+          (sub) => sub.studentId.toString() === studentId,
+        );
+
+        if (studentSubmission) {
+          assignmentObj.studentSubmission = {
+            _id: studentSubmission._id,
+            submittedAt: studentSubmission.submittedAt,
+            score: studentSubmission.score,
+            feedback: studentSubmission.feedback,
+            gradedAt: studentSubmission.gradedAt,
+          };
+        }
+      }
+
+      // Remove all submissions from response
+      delete assignmentObj.submissions;
+
+      return assignmentObj;
+    });
+
+    // Process quizzes to include student's attempts
+    const quizzesWithStatus = quizzes.map((quiz) => {
+      const quizObj: any = quiz.toObject();
+
+      if (studentId) {
+        // Find student's attempts
+        const studentAttempts = quiz.attempts.filter(
+          (attempt) => attempt.studentId.toString() === studentId,
+        );
+
+        if (studentAttempts.length > 0) {
+          quizObj.studentAttempts = studentAttempts.map((attempt) => ({
+            _id: attempt._id,
+            score: attempt.score,
+            attemptedAt: attempt.attemptedAt,
+            passed: attempt.score >= quiz.passingScore,
+          }));
+        }
+      }
+
+      // Remove all attempts from response
+      delete quizObj.attempts;
+
+      return quizObj;
+    });
+
+    res.json({
+      assignments: assignmentsWithStatus,
+      quizzes: quizzesWithStatus,
+    });
   } catch (error) {
     res.status(error instanceof AppError ? error.statusCode : 500).json({
       error:

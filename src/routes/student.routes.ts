@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Protected routes
 router.post("/enroll", authMiddleware, enrollCourse);
-router.get("/student/courses", authMiddleware, getStudentCourses);
+router.get("/courses", authMiddleware, getStudentCourses);
 router.get("/materials", authMiddleware, getLessonMaterials);
 router.post("/progress", authMiddleware, updateProgress);
 router.post("/assignments", authMiddleware, submitAssignment);
