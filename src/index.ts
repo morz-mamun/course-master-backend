@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: config.frontend_url || "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://course-master-beige.vercel.app"],
     credentials: true,
   }),
 );

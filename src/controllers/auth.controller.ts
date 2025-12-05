@@ -28,15 +28,9 @@ export const register = async (req: AuthRequest, res: Response) => {
       role: user.role as "student" | "admin",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: config.node_env === "production",
-      sameSite: config.node_env === "production" ? "none" : "lax",
-      maxAge: 1 * 24 * 60 * 60 * 1000,
-    });
-
     res.status(201).json({
       message: "User registered successfully",
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -68,15 +62,9 @@ export const login = async (req: AuthRequest, res: Response) => {
       role: user.role as "student" | "admin",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: config.node_env === "production",
-      sameSite: config.node_env === "production" ? "none" : "lax",
-      maxAge: 1 * 24 * 60 * 60 * 1000,
-    });
-
     res.json({
       message: "Login successful",
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -97,11 +85,6 @@ export const login = async (req: AuthRequest, res: Response) => {
  * @param res - Express response
  */
 export const logout = (req: AuthRequest, res: Response) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: config.node_env === "production",
-    sameSite: config.node_env === "production" ? "none" : "lax",
-  });
   res.json({ message: "Logged out successfully" });
 };
 
