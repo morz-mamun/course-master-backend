@@ -1,6 +1,606 @@
-# Course Master API - cURL Testing Guide
+# Course Master API - Testing Guide
 
-Complete cURL commands for testing all API endpoints in the terminal.
+Complete guide for testing all API endpoints using both **Postman** and **cURL**.
+
+---
+
+## 🚀 Postman API Testing Guide
+
+### Getting Started with Postman
+
+#### 1. Install Postman
+
+Download and install Postman from [https://www.postman.com/downloads/](https://www.postman.com/downloads/)
+
+#### 2. Import Collection
+
+You can manually create the collection following the steps below, or import a pre-configured collection.
+
+**To create a new collection:**
+
+1. Open Postman
+2. Click "New" → "Collection"
+3. Name it "Course Master API"
+4. Add a description: "API endpoints for Course Master platform"
+
+---
+
+### 📝 Setting Up Environment Variables
+
+Environment variables make it easy to switch between different environments (development, staging, production).
+
+#### Create Environment
+
+1. Click the **gear icon** (⚙️) in the top right
+2. Click **"Add"** to create a new environment
+3. Name it **"Course Master - Local"**
+4. Add the following variables:
+
+| Variable           | Initial Value           | Current Value               |
+| ------------------ | ----------------------- | --------------------------- |
+| `base_url`         | `http://localhost:5000` | `http://localhost:5000`     |
+| `admin_email`      | `admin@test.com`        | `admin@test.com`            |
+| `admin_password`   | `admin123`              | `admin123`                  |
+| `student_email`    | `john@test.com`         | `john@test.com`             |
+| `student_password` | `student123`            | `student123`                |
+| `course_id`        |                         | (will be set automatically) |
+| `assignment_id`    |                         | (will be set automatically) |
+| `quiz_id`          |                         | (will be set automatically) |
+
+5. Click **"Save"**
+6. Select this environment from the dropdown in the top right
+
+---
+
+### 🔐 Authentication Setup
+
+The API uses **HTTP-only cookies** for authentication. Postman automatically handles cookies.
+
+#### Folder Structure
+
+Create the following folder structure in your collection:
+
+```
+📁 Course Master API
+  📁 Authentication
+  📁 Courses
+    📁 Public
+    📁 Admin
+  📁 Student Operations
+  📁 Admin Operations
+```
+
+---
+
+### 📂 Authentication Endpoints
+
+#### 1. Register Student
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/auth/register`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "name": "John Doe",
+    "email": "{{student_email}}",
+    "password": "{{student_password}}",
+    "role": "student"
+  }
+  ```
+- **Tests (Scripts tab):**
+
+  ```javascript
+  pm.test("Status code is 201", function () {
+    pm.response.to.have.status(201);
+  });
+
+  pm.test("Response has user data", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("user");
+    pm.expect(jsonData.user).to.have.property("email");
+  });
+  ```
+
+#### 2. Register Admin
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/auth/register`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "name": "Admin User",
+    "email": "{{admin_email}}",
+    "password": "{{admin_password}}",
+    "role": "admin"
+  }
+  ```
+
+#### 3. Login Student
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/auth/login`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "email": "{{student_email}}",
+    "password": "{{student_password}}"
+  }
+  ```
+- **Tests:**
+
+  ```javascript
+  pm.test("Login successful", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Cookie is set", function () {
+    pm.expect(pm.cookies.has("token")).to.be.true;
+  });
+
+  var jsonData = pm.response.json();
+  pm.test("User role is student", function () {
+    pm.expect(jsonData.user.role).to.eql("student");
+  });
+  ```
+
+#### 4. Login Admin
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/auth/login`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "email": "{{admin_email}}",
+    "password": "{{admin_password}}"
+  }
+  ```
+
+#### 5. Get Current User
+
+- **Method:** `GET`
+- **URL:** `{{base_url}}/api/auth/me`
+- **Tests:**
+
+  ```javascript
+  pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("User data returned", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("user");
+  });
+  ```
+
+#### 6. Logout
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/auth/logout`
+- **Tests:**
+  ```javascript
+  pm.test("Logout successful", function () {
+    pm.response.to.have.status(200);
+  });
+  ```
+
+---
+
+### 📚 Course Endpoints
+
+#### 1. Get All Courses (Public)
+
+- **Method:** `GET`
+- **URL:** `{{base_url}}/api/courses`
+- **Query Params (optional):**
+  | Key | Value | Description |
+  |-----|-------|-------------|
+  | `search` | `javascript` | Search term |
+  | `category` | `programming` | Filter by category |
+  | `page` | `1` | Page number |
+  | `limit` | `10` | Items per page |
+  | `sort` | `price_asc` | Sort order |
+
+- **Tests:**
+
+  ```javascript
+  pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Response has data and meta", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("data");
+    pm.expect(jsonData).to.have.property("meta");
+  });
+  ```
+
+#### 2. Get Course by ID (Public)
+
+- **Method:** `GET`
+- **URL:** `{{base_url}}/api/courses/{{course_id}}`
+- **Tests:**
+
+  ```javascript
+  pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Course has required fields", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.course).to.have.property("title");
+    pm.expect(jsonData.course).to.have.property("syllabus");
+    pm.expect(jsonData.course).to.have.property("batches");
+  });
+  ```
+
+#### 3. Create Course (Admin Only)
+
+**⚠️ Important:** Login as admin first!
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/courses/admin/create`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "title": "JavaScript Fundamentals",
+    "description": "Learn JavaScript from scratch with hands-on examples",
+    "price": 49.99,
+    "category": "programming",
+    "tags": ["javascript", "web development", "beginner"],
+    "syllabus": [
+      {
+        "lessonId": "lesson-1",
+        "title": "Introduction to JavaScript",
+        "duration": 30,
+        "videoUrl": "https://example.com/videos/js-intro.mp4",
+        "description": "Overview of JavaScript and its ecosystem"
+      },
+      {
+        "lessonId": "lesson-2",
+        "title": "Variables and Data Types",
+        "duration": 45,
+        "videoUrl": "https://example.com/videos/js-variables.mp4",
+        "description": "Understanding variables, let, const, and data types"
+      }
+    ],
+    "batches": [
+      {
+        "batchId": "batch-1",
+        "startDate": "2024-03-01T00:00:00.000Z",
+        "endDate": "2024-05-01T00:00:00.000Z",
+        "capacity": 50
+      }
+    ]
+  }
+  ```
+- **Tests:**
+
+  ```javascript
+  pm.test("Course created successfully", function () {
+    pm.response.to.have.status(201);
+  });
+
+  var jsonData = pm.response.json();
+
+  // Save course ID for later use
+  if (jsonData.course && jsonData.course._id) {
+    pm.environment.set("course_id", jsonData.course._id);
+  }
+
+  pm.test("Course ID saved to environment", function () {
+    pm.expect(pm.environment.get("course_id")).to.not.be.undefined;
+  });
+  ```
+
+#### 4. Update Course (Admin Only)
+
+- **Method:** `PUT`
+- **URL:** `{{base_url}}/api/courses/admin/{{course_id}}`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "title": "JavaScript Fundamentals - Updated",
+    "price": 59.99
+  }
+  ```
+
+#### 5. Delete Course (Admin Only)
+
+- **Method:** `DELETE`
+- **URL:** `{{base_url}}/api/courses/admin/{{course_id}}`
+
+---
+
+### 🎓 Student Operations
+
+#### 1. Enroll in Course
+
+**⚠️ Important:** Login as student first!
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/enroll`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "courseId": "{{course_id}}",
+    "batchId": "batch-1"
+  }
+  ```
+- **Tests:**
+
+  ```javascript
+  pm.test("Enrollment successful", function () {
+    pm.response.to.have.status(201);
+  });
+
+  pm.test("Enrollment data returned", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("enrollment");
+  });
+  ```
+
+#### 2. Get Student Courses
+
+- **Method:** `GET`
+- **URL:** `{{base_url}}/api/student/courses`
+- **Tests:**
+
+  ```javascript
+  pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Courses array returned", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property("courses");
+    pm.expect(jsonData.courses).to.be.an("array");
+  });
+  ```
+
+#### 3. Update Progress
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/progress`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "courseId": "{{course_id}}",
+    "lessonId": "lesson-1"
+  }
+  ```
+- **Tests:**
+
+  ```javascript
+  pm.test("Progress updated", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Progress percentage calculated", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.progress).to.have.property("percentage");
+    pm.expect(jsonData.progress.percentage).to.be.a("number");
+  });
+  ```
+
+#### 4. Submit Assignment
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/assignments`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "assignmentId": "{{assignment_id}}",
+    "submissionText": "Here is my assignment solution. I implemented the required functionality using JavaScript ES6 features...",
+    "submissionLink": "https://github.com/johndoe/assignment-repo"
+  }
+  ```
+
+#### 5. Submit Quiz
+
+- **Method:** `POST`
+- **URL:** `{{base_url}}/api/quiz/submit`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Body (raw JSON):**
+  ```json
+  {
+    "quizId": "{{quiz_id}}",
+    "answers": [0, 2, 1, 3, 0],
+    "timeTaken": 450
+  }
+  ```
+- **Tests:**
+
+  ```javascript
+  pm.test("Quiz submitted successfully", function () {
+    pm.response.to.have.status(200);
+  });
+
+  pm.test("Score calculated", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.attempt).to.have.property("score");
+    pm.expect(jsonData).to.have.property("passed");
+  });
+  ```
+
+---
+
+### 🔄 Testing Workflows in Postman
+
+#### Complete Test Flow
+
+Create a **Collection Runner** workflow:
+
+1. Click on your collection → Click **"Run"**
+2. Select the requests in this order:
+   - Register Admin
+   - Login Admin
+   - Create Course
+   - Register Student
+   - Login Student
+   - Get All Courses
+   - Enroll in Course
+   - Get Student Courses
+   - Update Progress
+   - Get Current User
+
+3. Click **"Run Course Master API"**
+4. View results with pass/fail status for each test
+
+#### Using Pre-request Scripts
+
+Add this to your **Collection's Pre-request Script** for automatic token refresh:
+
+```javascript
+// Check if we need to login
+const currentTime = new Date().getTime();
+const tokenExpiry = pm.environment.get("token_expiry");
+
+if (!tokenExpiry || currentTime > tokenExpiry) {
+  console.log("Token expired or not set, logging in...");
+  // Token will be set via cookie automatically on login
+}
+```
+
+---
+
+### 🎯 Advanced Postman Features
+
+#### 1. Collection-level Tests
+
+Add to Collection → Tests tab:
+
+```javascript
+// Log response time
+console.log("Response time:", pm.response.responseTime + "ms");
+
+// Check response time is acceptable
+pm.test("Response time is less than 2000ms", function () {
+  pm.expect(pm.response.responseTime).to.be.below(2000);
+});
+```
+
+#### 2. Dynamic Variables
+
+Postman provides built-in dynamic variables:
+
+```json
+{
+  "email": "user_{{$timestamp}}@test.com",
+  "name": "{{$randomFullName}}",
+  "courseTitle": "{{$randomJobTitle}} Course"
+}
+```
+
+#### 3. Visualize Responses
+
+Add to the **Tests** tab to create visualizations:
+
+```javascript
+var template = `
+    <h2>Course Statistics</h2>
+    <table>
+        <tr><th>Total Courses</th><td>{{total}}</td></tr>
+        <tr><th>Current Page</th><td>{{page}}</td></tr>
+        <tr><th>Total Pages</th><td>{{totalPages}}</td></tr>
+    </table>
+`;
+
+var jsonData = pm.response.json();
+pm.visualizer.set(template, jsonData.meta);
+```
+
+---
+
+### 📤 Export & Share Collection
+
+#### Export Collection
+
+1. Click **"..."** next to collection name
+2. Select **"Export"**
+3. Choose **Collection v2.1** format
+4. Save as `course-master-api.postman_collection.json`
+
+#### Export Environment
+
+1. Click the **gear icon** (⚙️)
+2. Click **"..."** next to your environment
+3. Select **"Export"**
+4. Save as `course-master-local.postman_environment.json`
+
+#### Share with Team
+
+Share the exported files with your team, or publish to Postman workspace.
+
+---
+
+### 🐛 Debugging Tips
+
+#### 1. View Console
+
+- Open **Postman Console** (View → Show Postman Console)
+- See all requests, responses, and console.log outputs
+
+#### 2. Inspect Cookies
+
+- Click **"Cookies"** link below the Send button
+- View all cookies for the domain
+- Manually add/edit/delete cookies
+
+#### 3. Check Request Details
+
+- Click on a request in History
+- View exact headers, body, and response
+- Copy as cURL for command-line testing
+
+#### 4. Common Issues
+
+| Issue                 | Solution                               |
+| --------------------- | -------------------------------------- |
+| 401 Unauthorized      | Login first, ensure cookie is set      |
+| 404 Not Found         | Check URL and course_id variable       |
+| 500 Server Error      | Check server logs, verify request body |
+| Cookie not persisting | Disable "Interceptor" in settings      |
+
+---
 
 ## Base URL
 
@@ -10,10 +610,16 @@ BASE_URL="http://localhost:5000"
 
 ## 📋 Table of Contents
 
-- [Authentication](#authentication)
-- [Courses](#courses)
-- [Student Operations](#student-operations)
-- [Testing Flow](#testing-flow)
+- [Postman API Testing Guide](#-postman-api-testing-guide)
+- [cURL Testing Guide](#-curl-testing-guide)
+  - [Authentication](#authentication)
+  - [Courses](#courses)
+  - [Student Operations](#student-operations)
+  - [Testing Flow](#testing-flow)
+
+---
+
+## 📟 cURL Testing Guide
 
 ---
 
