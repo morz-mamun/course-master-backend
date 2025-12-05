@@ -414,3 +414,101 @@ export const getQuizzesByLesson = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+/**
+ * Get enrollment analytics data grouped by date
+ * @param req - Express request with optional startDate and endDate query params
+ * @param res - Express response
+ */
+export const getEnrollmentAnalytics = async (
+  req: AuthRequest,
+  res: Response,
+) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    // Default to last 30 days if no date range provided
+    const end = endDate ? new Date(endDate as string) : new Date();
+    const start = startDate
+      ? new Date(startDate as string)
+      : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Set end date to end of day
+    end.setHours(23, 59, 59, 999);
+    // Set start date to beginning of day
+    start.setHours(0, 0, 0, 0);
+
+    // Aggregate enrollments by date
+    const enrollmentData = await Enrollment.aggregate([
+      {
+        $match: {
+          enrolledAt: {
+            $gte: start,
+            $lte: end,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$enrolledAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: "$_id",
+          count: 1,
+        },
+      },
+    ]);
+
+    // Fill in missing dates with zero enrollments
+    const filledData = [];
+    const currentDate = new Date(start);
+
+    while (currentDate <= end) {
+      const dateStr = currentDate.toISOString().split("T")[0];
+      const existingData = enrollmentData.find((d) => d.date === dateStr);
+
+      filledData.push({
+        date: dateStr,
+        count: existingData ? existingData.count : 0,
+      });
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Calculate summary statistics
+    const totalEnrollments = filledData.reduce(
+      (sum, item) => sum + item.count,
+      0,
+    );
+    const averagePerDay =
+      filledData.length > 0 ? totalEnrollments / filledData.length : 0;
+
+    res.json({
+      data: filledData,
+      summary: {
+        totalEnrollments,
+        averagePerDay: Math.round(averagePerDay * 100) / 100,
+        dateRange: {
+          start: start.toISOString().split("T")[0],
+          end: end.toISOString().split("T")[0],
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch enrollment analytics",
+    });
+  }
+};

@@ -11,6 +11,7 @@ import {
   createQuiz,
   getAssignmentsByLesson,
   getQuizzesByLesson,
+  getEnrollmentAnalytics,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -98,6 +99,18 @@ router.get(
   authMiddleware,
   adminMiddleware,
   getQuizzesByLesson,
+);
+
+/**
+ * @route   GET /api/admin/analytics/enrollments
+ * @desc    Get enrollment analytics data over time
+ * @access  Admin only
+ */
+router.get(
+  "/analytics/enrollments",
+  authMiddleware,
+  adminMiddleware,
+  getEnrollmentAnalytics,
 );
 
 export default router;
