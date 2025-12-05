@@ -70,6 +70,7 @@ export class CourseService {
     const skip = (page - 1) * limit;
 
     const courses = await Course.find(filter)
+      .populate("instructor", "name email")
       .sort(sortObj)
       .skip(skip)
       .limit(limit)

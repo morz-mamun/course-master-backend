@@ -92,7 +92,12 @@ export class StudentService {
     const enrollments = await Enrollment.find({ studentId })
       .populate({
         path: "courseId",
-        select: "title description category price enrollmentCount",
+        select:
+          "title description category price enrollmentCount instructor syllabus",
+        populate: {
+          path: "instructor",
+          select: "name email",
+        },
       })
       .lean();
 
